@@ -1,0 +1,11 @@
+- name: "Install MongoDB"
+  yum: >
+    name={{ item }}
+    state=present
+    enablerepo=mongodb,epel
+  with_items:
+    - mongodb-org-{{ mongodb_version }}
+    - python-pymongo
+  tags:
+    - mongodb
+    - pkgs

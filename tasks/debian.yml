@@ -1,0 +1,29 @@
+- name: "Add MongoDB's GPG key"
+  shell: |
+    apt-key adv \
+      --keyserver keyserver.ubuntu.com \
+      --recv 7F0CEB10
+  tags:
+    - mongodb
+    - repos
+
+- name: "Add MongoDB's repository to sources.list"
+  apt_repository: >
+    state=present
+    repo="deb http://downloads-distro.mongodb.org/repo/debian-sysvinit dist 10gen"
+  tags:
+    - mongodb
+    - repos
+
+- name: "Install MongoDB"
+  apt: >
+    name={{ item }}
+    update_cache=yes
+    state=installed
+  with_items:
+    - mongodb-org={{ mongodb_version }}
+    - python-pymongo
+  tags:
+    - mongodb
+    - pkgs
+    - libs

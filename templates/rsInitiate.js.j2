@@ -1,0 +1,21 @@
+var initiate = rs.initiate({
+	"_id" : "{{ mongodb_replica_set_name }}",
+	"members" : [
+{%- for host in groups[mongodb_replica_set_name] -%}
+		{
+			"_id" : {{ loop.index0 }},
+	{% if hostvars[host]['mongodb_is_arbiter'] is defined and hostvars[host]['mongodb_is_arbiter']|bool == true %}
+			"arbiterOnly" : true,
+	{% endif %}
+			"host" : "{{ hostvars[host]['ansible_ssh_host'] }}:27017"
+		}
+{%- if not loop.last %},{% endif -%}
+{%- endfor -%}
+	]
+})
+
+if (initiate.ok != 1) {
+  printjson(initiate)
+} else {
+  printjson(rs.conf())
+}

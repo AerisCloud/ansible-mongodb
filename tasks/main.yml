@@ -1,0 +1,66 @@
+- include: centos.yml
+  when: ansible_distribution == 'CentOS'
+
+- include: debian.yml
+  when: ansible_distribution == 'Debian'
+
+- name: "Move the data folder if necessary"
+  shell: |
+    creates={{ mongodb_data_path }}
+
+    current="$(grep "dbpath=" /etc/mongod.conf 2> /dev/null | cut -d"=" -f2)"
+
+    [ "${current}" == "" ] && exit 0
+
+    mv ${current} {{ mongodb_data_path }}
+  tags:
+    - mongodb
+
+- name: "Change settings for arbiter"
+  set_fact:
+    mongodb_smallfiles: true
+    mongodb_nojournal: true
+  when: mongodb_replica_set_name is defined and mongodb_is_arbiter|bool == true
+  tags:
+    - mongodb
+
+- name: "Ensure mongod.conf file is present"
+  template: >
+    src=mongod.conf
+    dest=/etc/mongod.conf
+    owner=root
+    group=root
+    mode=0644
+  notify:
+    - Restart MongoDB
+  tags:
+    - mongodb
+    - files
+    - cfgs
+
+- name: "Ensure MongoDB is running, and starts on boot"
+  service: >
+    name=mongod
+    state=started
+    enabled=yes
+  tags:
+    - mongodb
+
+- name: "Copy the rsInitiate.js script"
+  template: >
+    src=rsInitiate.js.j2
+    dest=/tmp/rsInitiate.js
+    owner=root
+    group=root
+    mode=0644
+  when: mongodb_replica_set_name is defined and mongodb_bootstrap == "{{ inventory_hostname }}"
+  tags:
+    - mongodb
+    - files
+
+- name: "Initiate the replicaSet"
+  shell: |
+    mongo /tmp/rsInitiate.js
+  when: mongodb_replica_set_name is defined and mongodb_bootstrap == "{{ inventory_hostname }}"
+  tags:
+    - mongodb

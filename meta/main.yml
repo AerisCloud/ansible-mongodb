@@ -1,0 +1,25 @@
+galaxy_info:
+  author: Emilien Kenler <ekenler@wizcorp.jp>
+  description: Installs and configure MongoDB
+  company: Wizcorp K.K.
+  license: MIT
+  min_ansible_version: 1.8.1
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: debian
+      versions:
+        - wheezy
+  categories:
+    - database
+    - database:nosql
+dependencies:
+  - role: aeriscloud.repos
+    repositories:
+      centos6:
+        - mongodb
+      centos7:
+        - mongodb
+  - role: aeriscloud.yum
