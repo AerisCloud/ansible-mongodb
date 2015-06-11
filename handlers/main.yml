@@ -4,11 +4,3 @@
     state=restarted
   tags:
     - mongodb
-
-- name: "Restart collectd"
-  service: >
-    name=collectd
-    state=restarted
-  tags:
-    - mongodb
-    - collectd
