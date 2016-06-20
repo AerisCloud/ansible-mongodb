@@ -9,17 +9,17 @@ galaxy_info:
       versions:
         - 6
         - 7
-    - name: debian
+    - name: Debian
       versions:
         - wheezy
   categories:
     - database
     - database:nosql
 dependencies:
-  - role: aeriscloud.repos
+  - role: AerisCloud.repos
     repositories:
       centos6:
         - mongodb
       centos7:
         - mongodb
-  - role: aeriscloud.yum
+  - role: AerisCloud.yum
